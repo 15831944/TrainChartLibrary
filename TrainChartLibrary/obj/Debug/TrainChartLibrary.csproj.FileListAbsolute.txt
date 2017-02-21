@@ -1,0 +1,5 @@
+C:\Users\SMI\Desktop\TrainChartLibrary\TrainChartLibrary\bin\Debug\TrainChartLibrary.dll
+C:\Users\SMI\Desktop\TrainChartLibrary\TrainChartLibrary\bin\Debug\TrainChartLibrary.pdb
+C:\Users\SMI\Desktop\TrainChartLibrary\TrainChartLibrary\obj\Debug\TrainChartLibrary.csprojResolveAssemblyReference.cache
+C:\Users\SMI\Desktop\TrainChartLibrary\TrainChartLibrary\obj\Debug\TrainChartLibrary.dll
+C:\Users\SMI\Desktop\TrainChartLibrary\TrainChartLibrary\obj\Debug\TrainChartLibrary.pdb
