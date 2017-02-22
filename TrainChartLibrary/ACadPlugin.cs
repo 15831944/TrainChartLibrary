@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
 [assembly: CommandClass(typeof(TrainChartLibrary.ACadPlugin))]
@@ -38,9 +34,13 @@ namespace TrainChartLibrary
                 // открываем таблицу слоев документа
                 LayerTable acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId, OpenMode.ForWrite) as LayerTable;
 
-                // А теперь создаем нужные мне объекты через TrainChartGenerator
-                TrainChartGenerator trainChartGenerator = new TrainChartGenerator(acCurDb, acTrans, acBlkTblRec, acLyrTbl, _fullFileNameWithData);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // А теперь создаем нужные мне объекты 
+                ACadWorker aCadWorker = new ACadWorker(acCurDb, acTrans, acBlkTblRec, acLyrTbl);
+                TrainChartGenerator trainChartGenerator = new TrainChartGenerator(aCadWorker, _fullFileNameWithData);
                 trainChartGenerator.Generate();
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // фиксируем изменения
                 acTrans.Commit();
@@ -50,20 +50,20 @@ namespace TrainChartLibrary
         // функция инициализации (выполняется при загрузке плагина)
         public void Initialize()
         {
-            string greeting = "Привет! \n" +
-                              "Я плагин для построения суточника! \n" +
-                              "У меня есть одна команда: GenerateTrainChart \n" +
-                              "Запусти ее для построения суточника. \n" +
-                              "Обратите внимания, что команда потребует ввод пути к файлу с данными! \n";
+            //string greeting = "Привет! \n" +
+            //                  "Я плагин для построения суточника! \n" +
+            //                  "У меня есть одна команда: GenerateTrainChart \n" +
+            //                  "Запусти ее для построения суточника. \n" +
+            //                  "Обратите внимания, что команда потребует ввод пути к файлу с данными! \n";
 
-            MessageBox.Show(greeting);
-            // разберемся с wpf добавим окошечки)
+            //MessageBox.Show(greeting);
+            //// разберемся с wpf добавим окошечки)
         }
 
         // функция, выполняемая при выгрузке плагина
         public void Terminate()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

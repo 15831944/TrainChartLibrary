@@ -53,8 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACadWorker.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DataFileParser.cs" />
+    <Compile Include="IGenerator.cs" />
+    <Compile Include="LineGenerator.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="TableGenerator.cs" />
     <Compile Include="TrainChartGenerator.cs" />
     <Compile Include="ACadPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
