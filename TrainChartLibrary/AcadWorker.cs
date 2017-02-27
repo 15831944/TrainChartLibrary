@@ -169,6 +169,44 @@ namespace TrainChartLibrary
             }
         }
 
+        public void MakePolyline(int beginX, int beginY, int endX, int endY, string typeName, double scale)
+        {
+            // Create a lightweight polyline
+            using (Polyline acPoly = new Polyline())
+            {
+                acPoly.AddVertexAt(0, new Point2d(beginX, beginY), 0, 0, 0);
+                acPoly.AddVertexAt(1, new Point2d(endX, endY), 0, 0, 0);
+
+                // устанавливаем толщину линии
+                acPoly.Linetype = typeName;
+
+                // устнавливаем масштаб линии
+                acPoly.LinetypeScale = scale;
+
+                // Add the new object to the block table record and the transaction
+                _model.AppendEntity(acPoly);
+                _transaction.AddNewlyCreatedDBObject(acPoly, true);
+
+                // Close the polyline
+                acPoly.Closed = true;
+            }
+        }
+
+        public void MakeMText(int x, int y, int height, string text)
+        {
+            // Create a multiline text object
+            using (MText acMText = new MText())
+            {
+                acMText.Location = new Point3d(x, y, 0);
+                acMText.TextHeight = height;
+                acMText.Contents = text;
+                
+
+                _model.AppendEntity(acMText);
+                _transaction.AddNewlyCreatedDBObject(acMText, true);
+            }
+        }
+
 
 
         public void SetGlobalLinetypeScale(double scale)
