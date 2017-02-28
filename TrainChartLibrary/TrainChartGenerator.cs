@@ -17,7 +17,7 @@ namespace TrainChartLibrary
     {
         private readonly ACadWorker _acadWorker; 
         // имя файла с данными для суточника
-        private string _fullFileName;
+        private readonly string _fullFileName;
 
         public TrainChartGenerator(ACadWorker aCadWorker, string fullFileName)
         {
@@ -30,20 +30,27 @@ namespace TrainChartLibrary
             return _acadWorker;
         }
 
+        /// <summary>
+        /// Создает суточник
+        /// </summary>
         public void Generate()
         {
-            Parser parser = new Parser(_fullFileName);
-            int rowsNumber = parser.GetAmountOfRows();
+            FileParser parser = new FileParser(_fullFileName); // Парсим файл
+            int rowsNumber = parser.GetAmountOfRows(); // Получаем количество строк (путей)
 
+            // Делаем таблицу для суточника
             TableGenerator tableGenerator = new TableGenerator(GetACadWorker(), rowsNumber);
             tableGenerator.Generate();
 
+            // Генерируем каждую строчку суточника
             List<string> listOfLines = parser.GetListOfLines();
+            int y = (rowsNumber - 1)*Constants.HeightOfRow; // начинаем заполнять с первой строки (y - ординита строки)
             foreach (string str in listOfLines)
             {
-                LineGenerator lineGenerator = new LineGenerator(GetACadWorker(), str);
+                SingleLineGenerator lineGenerator = new SingleLineGenerator(GetACadWorker(), str, y);
                 lineGenerator.Generate();
-            
+                y -= Constants.HeightOfRow;
+
             }
         }
 

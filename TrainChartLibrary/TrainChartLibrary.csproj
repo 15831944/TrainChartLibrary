@@ -55,9 +55,11 @@
   <ItemGroup>
     <Compile Include="ACadWorker.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="ElementMaker.cs" />
     <Compile Include="IGenerator.cs" />
-    <Compile Include="LineGenerator.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="SingleLineGenerator.cs" />
+    <Compile Include="FileParser.cs" />
+    <Compile Include="StringParser.cs" />
     <Compile Include="TableGenerator.cs" />
     <Compile Include="TrainChartGenerator.cs" />
     <Compile Include="ACadPlugin.cs" />

@@ -18,5 +18,10 @@ namespace TrainChartLibrary
         public const int LengthOfNumberTrack = 25;
         public const int HeightOfNumbers = 8;
         public const int Indent = 2;
+
+        // константы для текстового файла
+        public const char TrackNameSeparator = ':';
+        public const char OperationsSeparator = ' ';
+        public const char WordsInOperationSeparator = '-';
     }
 }

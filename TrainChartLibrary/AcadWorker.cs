@@ -33,13 +33,29 @@ namespace TrainChartLibrary
         /// <param name="layerName"></param>
         public void CreateNewLayer(string layerName)
         {
-            // создаем новый слой и задаем ему имя
-            LayerTableRecord newLayer = new LayerTableRecord();
-            newLayer.Name = layerName;
-            // заносим созданный слой в таблицу слоев
-            _layers.Add(newLayer);
-            // добавляем созданный слой в документ
-            _transaction.AddNewlyCreatedDBObject(newLayer, true);
+            // Open the Layer table for read
+            LayerTable layerTable;
+            layerTable = _transaction.GetObject(_dataBase.LayerTableId,
+                                            OpenMode.ForRead) as LayerTable;
+
+            // создаем только если слоя еще нет
+            if (layerTable.Has(layerName) == false)
+            {
+                // создаем новый слой и задаем ему параметры
+                using (LayerTableRecord newLayer = new LayerTableRecord())
+                {
+                    newLayer.Name = layerName;
+                    // Assign the layer the ACI color 3 and a name
+                    // newLayer.Color = Color.FromColorIndex(ColorMethod.ByAci, 3); // так можно задать цвет слою
+
+                    // Upgrade the Layer table for write
+                    layerTable.UpgradeOpen();
+
+                    // Append the new layer to the Layer table and the transaction
+                    layerTable.Add(newLayer);
+                    _transaction.AddNewlyCreatedDBObject(newLayer, true);
+                }
+            }
         }
 
         /// <summary>
@@ -69,19 +85,21 @@ namespace TrainChartLibrary
         }
 
         /// <summary>
-        /// Создает квадрат
+        /// Создает квадрат, можно указать точку вставки
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public void MakeBox(int width, int height)
+        /// <param name="beginX"></param>
+        /// <param name="beginY"></param>
+        public void MakeBox(int width, int height, int beginX = 0, int beginY = 0)
         {
             // Create a lightweight polyline
             using (Polyline acPoly = new Polyline())
             {
-                acPoly.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
-                acPoly.AddVertexAt(1, new Point2d(width, 0), 0, 0, 0);
-                acPoly.AddVertexAt(2, new Point2d(width, height), 0, 0, 0);
-                acPoly.AddVertexAt(3, new Point2d(0, height), 0, 0, 0);
+                acPoly.AddVertexAt(0, new Point2d(beginX, beginY), 0, 0, 0);
+                acPoly.AddVertexAt(1, new Point2d(beginX + width, beginY), 0, 0, 0);
+                acPoly.AddVertexAt(2, new Point2d(beginX + width, beginY + height), 0, 0, 0);
+                acPoly.AddVertexAt(3, new Point2d(beginX, beginY + height), 0, 0, 0);
 
                 // Add the new object to the block table record and the transaction
                 _model.AppendEntity(acPoly);
@@ -315,6 +333,16 @@ namespace TrainChartLibrary
                 // Load the Center Linetype
                 _dataBase.LoadLineTypeFile(sLineTypName, "acad.lin");
             }
+        }
+
+        private void SetGlobalLineScale(double scale)
+        {
+            _dataBase.Ltscale = scale;
+        }
+
+        private void SetGlobalLineScaleDefault(double scale)
+        {
+            _dataBase.Ltscale = scale;
         }
     }
 }
