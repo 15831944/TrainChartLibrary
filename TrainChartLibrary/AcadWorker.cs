@@ -27,21 +27,10 @@ namespace TrainChartLibrary
             _layers = acLyrTbl;
         }
 
-        public void InitLine()
-        {
-            // создаем линию между точками с указанными координатами
-            Line acLine = new Line(new Point3d(25, 25, 0), new Point3d(33, 33, 0));
-
-            // устанавливаем параметры созданного объекта равными параметрам по умолчанию
-            acLine.SetDatabaseDefaults();
-
-            // добавляем созданный объект в пространство модели
-            _model.AppendEntity(acLine);
-
-            // также добавляем созданный объект в транзакцию
-            _transaction.AddNewlyCreatedDBObject(acLine, true);
-        }
-
+        /// <summary>
+        /// Создает новый слой на четртеже по имени
+        /// </summary>
+        /// <param name="layerName"></param>
         public void CreateNewLayer(string layerName)
         {
             // создаем новый слой и задаем ему имя
@@ -53,11 +42,18 @@ namespace TrainChartLibrary
             _transaction.AddNewlyCreatedDBObject(newLayer, true);
         }
 
+        /// <summary>
+        /// Задает текущий слой
+        /// </summary>
+        /// <param name="layerName"></param>
         public void MakeLayerCurrent(string layerName)
         {
             _dataBase.Clayer = _layers[layerName];
         }
 
+        /// <summary>
+        /// Вспомогательная функция
+        /// </summary>
         public void InitSolidObject()
         {
             // Create a quadrilateral (bow-tie) solid in Model space
@@ -72,6 +68,11 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает квадрат
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void MakeBox(int width, int height)
         {
             // Create a lightweight polyline
@@ -91,6 +92,12 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает квадрат с указанной толщиной линии
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="lineWeight"></param>
         public void MakeBox(int width, int height, LineWeight lineWeight)
         {
             // Create a lightweight polyline
@@ -112,6 +119,13 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает полилинию
+        /// </summary>
+        /// <param name="beginX"></param>
+        /// <param name="beginY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
         public void MakePolyline(int beginX, int beginY, int endX, int endY)
         {
             // Create a lightweight polyline
@@ -129,6 +143,14 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает полилинию с указанной толщиной линии
+        /// </summary>
+        /// <param name="beginX"></param>
+        /// <param name="beginY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="lineWeight"></param>
         public void MakePolyline(int beginX, int beginY, int endX, int endY, LineWeight lineWeight)
         {
             // Create a lightweight polyline
@@ -149,6 +171,14 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает полилинию с указанным типом линии
+        /// </summary>
+        /// <param name="beginX"></param>
+        /// <param name="beginY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="typeName"></param>
         public void MakePolyline(int beginX, int beginY, int endX, int endY, string typeName)
         {
             // Create a lightweight polyline
@@ -169,6 +199,15 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Создает полилинию с указанным типом линии и масштабом
+        /// </summary>
+        /// <param name="beginX"></param>
+        /// <param name="beginY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <param name="typeName"></param>
+        /// <param name="scale"></param>
         public void MakePolyline(int beginX, int beginY, int endX, int endY, string typeName, double scale)
         {
             // Create a lightweight polyline
@@ -192,13 +231,20 @@ namespace TrainChartLibrary
             }
         }
 
-        public void MakeMText(int x, int y, int height, string text)
+        /// <summary>
+        /// Создает многострочный текст с указанным размером шрифта
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="fontSize"></param>
+        /// <param name="text"></param>
+        public void MakeMText(int x, int y, int fontSize, string text)
         {
             // Create a multiline text object
             using (MText acMText = new MText())
             {
                 acMText.Location = new Point3d(x, y, 0);
-                acMText.TextHeight = height;
+                acMText.TextHeight = fontSize;
                 acMText.Contents = text;
                 
 
@@ -207,24 +253,54 @@ namespace TrainChartLibrary
             }
         }
 
-
-
-        public void SetGlobalLinetypeScale(double scale)
+        /// <summary>
+        /// Создает многострочный текст с указанным размером шрифта и шириной поля
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="fontSize"></param>
+        /// <param name="width"></param>
+        /// <param name="text"></param>
+        public void MakeMText(int x, int y, int fontSize, int width, string text)
         {
-            _dataBase.Ltscale = scale;
+            // Create a multiline text object
+            using (MText acMText = new MText())
+            {
+                acMText.Location = new Point3d(x, y, 0);
+                acMText.TextHeight = fontSize; // размер шрифта
+                acMText.Width = width; // ширина поля
+                acMText.Contents = text;
+
+
+                _model.AppendEntity(acMText);
+                _transaction.AddNewlyCreatedDBObject(acMText, true);
+            }
         }
 
+        /// <summary>
+        /// Задает цвет по умолчанию
+        /// </summary>
         public void SetDefaultColor()
         {
             _dataBase.Cecolor = Color.FromColorIndex(ColorMethod.ByLayer, 256);
         }
 
+        /// <summary>
+        /// Задает текущий цвет
+        /// </summary>
+        /// <param name="b1"></param>
+        /// <param name="b2"></param>
+        /// <param name="b3"></param>
         public void SetCurrentColor(byte b1, byte b2, byte b3)
         {
             // Set the current color
             _dataBase.Cecolor = Color.FromRgb(b1, b2, b3);
         }
 
+        /// <summary>
+        /// Загружает тип линии из "acad.lin"
+        /// </summary>
+        /// <param name="typeName"></param>
         public void LoadLineType(string typeName)
         {
             // Open the Linetype table for read
