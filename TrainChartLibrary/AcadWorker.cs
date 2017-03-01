@@ -1,7 +1,8 @@
-﻿
-using Autodesk.AutoCAD.Colors;
+﻿using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using static Autodesk.AutoCAD.ApplicationServices.Application;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace TrainChartLibrary
 {
@@ -471,6 +472,11 @@ namespace TrainChartLibrary
                 _model.AppendEntity(acSpline);
                 _transaction.AddNewlyCreatedDBObject(acSpline, true);
             }
+        }
+
+        public void MakeMessage(string message)
+        {
+            Application.ShowAlertDialog(message);
         }
     }
 }

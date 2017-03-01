@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -9,7 +10,8 @@ namespace TrainChartLibrary
     /// </summary>
     class ElementMaker
     {
-        private ACadWorker _aCadWorker;
+        private ACadWorker _aCadWorker; // выполняет автокадовские команды
+        private Dictionary<string, Point3d> lastTrainPointDictionary = new Dictionary<string, Point3d>(); // храним последнюю коорденату блока поезда
 
         /// Ордината начала строки
         /// </summary>
@@ -40,7 +42,7 @@ namespace TrainChartLibrary
                 _aCadWorker.CreateNewLayer(trainNumber, Constants.ElementLineWeight);
                 _aCadWorker.MakeLayerCurrent(trainNumber);
 
-                MakeElement(operationType, begin, _y, duration);
+                MakeElement(operationType, begin, _y, duration, trainNumber);
             }
             catch (IndexOutOfRangeException ignored) {} // для игнорирования лишних пробелов
 
@@ -55,7 +57,8 @@ namespace TrainChartLibrary
         /// <param name="beginX"></param>
         /// <param name="beginY"></param>
         /// <param name="duration"></param>
-        private void MakeElement(string operationType, int beginX, int beginY, int duration)
+        /// /// <param name="trainNumber"></param>
+        private void MakeElement(string operationType, int beginX, int beginY, int duration, string trainNumber)
         {
             switch (operationType)
             {
@@ -66,7 +69,7 @@ namespace TrainChartLibrary
                 }
                 case Constants.Moving:
                 {
-                    MakeMoving(beginX, beginY, duration);
+                    MakeMoving(beginX, beginY, duration, trainNumber);
                     break;
                 }
                 case Constants.TO:
@@ -148,17 +151,38 @@ namespace TrainChartLibrary
         /// <param name="beginX"></param>
         /// <param name="beginY"></param>
         /// <param name="duration"></param>
-        private void MakeMoving(int beginX, int beginY, int duration)
+        /// <param name="trainNumber"></param>
+        private void MakeMoving(int beginX, int beginY, int duration, string trainNumber)
         {
             _aCadWorker.MakeBox(duration, Constants.ElementHeight, beginX, beginY);
             _aCadWorker.MakePolyline(beginX, beginY, beginX + duration, beginY + Constants.ElementHeight);
+
+            // для соединения
+            MakeMovementLine(trainNumber, beginX, beginY);
+        }
+
+        private void MakeMovementLine(string trainNumber, int x, int y)
+        {
+            if (lastTrainPointDictionary.ContainsKey(trainNumber)) // если уже был блок движения 
+            {
+                Point3d point3D;
+                lastTrainPointDictionary.TryGetValue(trainNumber, out point3D);
+                _aCadWorker.MakePolyline((int) point3D.X, (int) point3D.Y, x, y); // рисуем линию
+                lastTrainPointDictionary.Remove(trainNumber);
+            }
+            // добавляем новую точку
+            lastTrainPointDictionary.Add(trainNumber, new Point3d(x, y, 0));
+            //_aCadWorker.MakeMessage(String.Format("I've just add {0} - {1}", x, y));
         }
 
         private void MakeWaiting(int beginX, int beginY, int duration)
         {
             _aCadWorker.MakeBox(duration, Constants.ElementHeight, beginX, beginY);
-            Point3dCollection point3DCollection = new Point3dCollection();
-            point3DCollection.Add(new Point3d(beginX, beginY + Constants.ElementHeight / 2, 0)); // первая точка
+            Point3dCollection point3DCollection = new Point3dCollection
+            {
+                new Point3d(beginX, beginY + Constants.ElementHeight/2, 0)
+            };
+            // первая точка
 
             // промежуточные точки
             int points = 10;
@@ -177,6 +201,14 @@ namespace TrainChartLibrary
             point3DCollection.Add(new Point3d(beginX + duration, beginY + Constants.ElementHeight / 2, 0)); // последняя точка
 
             _aCadWorker.MakeSpline(point3DCollection);
+        }
+
+        public void PrintDict()
+        {
+            foreach (KeyValuePair<string, Point3d> kvp in lastTrainPointDictionary)
+            {
+                _aCadWorker.MakeMessage(String.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value));
+            }
         }
     }
 }
