@@ -23,5 +23,18 @@ namespace TrainChartLibrary
         public const char TrackNameSeparator = ':';
         public const char OperationsSeparator = ' ';
         public const char WordsInOperationSeparator = '-';
+
+        // константы для элементов графика
+        public const int HeightOfInscriptions = 8;                                 // высота надписей на элементах
+        public const int ElementHeight = 10;                                       // высота элементов графика
+        public const LineWeight ElementLineWeight = LineWeight.LineWeight040;      // толщина линии элементов графика
+        public const string Waiting = "waiting";                                   // типы операций, доступные для программы
+        public const string Moving = "moving";
+        public const string TO = "to";
+        public const string BrakeTesting = "brake";
+        public const string Coupling = "coupling";
+        public const string UnCoupling = "unCoupling";
+        public const string Loading = "loading";
+        public const string UnLoading = "unLoading";
     }
 }

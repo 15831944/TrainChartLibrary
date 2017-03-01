@@ -59,6 +59,37 @@ namespace TrainChartLibrary
         }
 
         /// <summary>
+        /// Создает новый слой на четртеже по имени и задает толщину линии для слоя
+        /// </summary>
+        /// <param name="layerName"></param>
+        /// <param name="lineWeight"></param>
+        public void CreateNewLayer(string layerName, LineWeight lineWeight)
+        {
+            // Open the Layer table for read
+            LayerTable layerTable;
+            layerTable = _transaction.GetObject(_dataBase.LayerTableId,
+                                            OpenMode.ForRead) as LayerTable;
+
+            // создаем только если слоя еще нет
+            if (layerTable.Has(layerName) == false)
+            {
+                // создаем новый слой и задаем ему параметры
+                using (LayerTableRecord newLayer = new LayerTableRecord())
+                {
+                    newLayer.Name = layerName;
+                    newLayer.LineWeight = lineWeight;
+
+                    // Upgrade the Layer table for write
+                    layerTable.UpgradeOpen();
+
+                    // Append the new layer to the Layer table and the transaction
+                    layerTable.Add(newLayer);
+                    _transaction.AddNewlyCreatedDBObject(newLayer, true);
+                }
+            }
+        }
+
+        /// <summary>
         /// Задает текущий слой
         /// </summary>
         /// <param name="layerName"></param>
@@ -68,15 +99,20 @@ namespace TrainChartLibrary
         }
 
         /// <summary>
-        /// Вспомогательная функция
+        /// Добавляет заливку по 3 точкам
         /// </summary>
-        public void InitSolidObject()
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        public void MakeSolidRegion(int x1, int y1, int x2, int y2, int x3, int y3)
         {
             // Create a quadrilateral (bow-tie) solid in Model space
-            using (Solid ac2DSolidBow = new Solid(new Point3d(0, 0, 0),
-                                            new Point3d(5, 0, 0),
-                                            new Point3d(5, 8, 0),
-                                            new Point3d(0, 8, 0)))
+            using (Solid ac2DSolidBow = new Solid(new Point3d(x1, y1, 0),
+                                            new Point3d(x2, y2, 0),
+                                            new Point3d(x3, y3, 0)))
             {
                 // Add the new object to the block table record and the transaction
                 _model.AppendEntity(ac2DSolidBow);
@@ -250,6 +286,30 @@ namespace TrainChartLibrary
         }
 
         /// <summary>
+        /// Строит полилинию по 3 точкам
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="x3"></param>
+        /// <param name="y3"></param>
+        public void MakePolyline(int x1, int y1, double x2, int y2, int x3, int y3)
+        {
+            // Create a lightweight polyline
+            using (Polyline acPoly = new Polyline())
+            {
+                acPoly.AddVertexAt(0, new Point2d(x1, y1), 0, 0, 0);
+                acPoly.AddVertexAt(1, new Point2d(x2, y2), 0, 0, 0);
+                acPoly.AddVertexAt(2, new Point2d(x3, y3), 0, 0, 0);
+
+                // Add the new object to the block table record and the transaction
+                _model.AppendEntity(acPoly);
+                _transaction.AddNewlyCreatedDBObject(acPoly, true);
+            }
+        }
+
+        /// <summary>
         /// Создает многострочный текст с указанным размером шрифта
         /// </summary>
         /// <param name="x"></param>
@@ -288,6 +348,32 @@ namespace TrainChartLibrary
                 acMText.TextHeight = fontSize; // размер шрифта
                 acMText.Width = width; // ширина поля
                 acMText.Contents = text;
+
+
+                _model.AppendEntity(acMText);
+                _transaction.AddNewlyCreatedDBObject(acMText, true);
+            }
+        }
+
+        /// <summary>
+        /// Создает многострочный текст с указанным размером шрифта и шириной поля, и выравниванием
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="fontSize"></param>
+        /// <param name="width"></param>
+        /// <param name="text"></param>
+        /// <param name="attachmentPoint"></param>
+        public void MakeMText(int x, int y, int fontSize, int width, string text, AttachmentPoint attachmentPoint)
+        {
+            // Create a multiline text object
+            using (MText acMText = new MText())
+            {
+                acMText.Location = new Point3d(x, y, 0);
+                acMText.TextHeight = fontSize; // размер шрифта
+                acMText.Width = width; // ширина поля
+                acMText.Contents = text;
+                acMText.Attachment = attachmentPoint; // выравнивание
 
 
                 _model.AppendEntity(acMText);
@@ -343,6 +429,48 @@ namespace TrainChartLibrary
         private void SetGlobalLineScaleDefault(double scale)
         {
             _dataBase.Ltscale = scale;
+        }
+
+        public void CreateSpline()
+        {
+            // Create a Point3d Collection
+            Point3dCollection acPt3dColl = new Point3dCollection();
+            acPt3dColl.Add(new Point3d(1, 1, 0));
+            acPt3dColl.Add(new Point3d(5, 5, 0));
+            acPt3dColl.Add(new Point3d(10, 0, 0));
+
+            // Set the start and end tangency
+            Vector3d acStartTan = new Vector3d(0.5, 0.5, 0);
+            Vector3d acEndTan = new Vector3d(0.5, 0.5, 0);
+
+            // Create a spline
+            using (Spline acSpline = new Spline(acPt3dColl,
+                                            acStartTan,
+                                            acEndTan, 4, 0))
+            {
+
+                // Add the new object to the block table record and the transaction
+                _model.AppendEntity(acSpline);
+                _transaction.AddNewlyCreatedDBObject(acSpline, true);
+            }
+        }
+
+        public void MakeSpline(Point3dCollection point3DCollection)
+        {
+            // Set the start and end tangency
+            Vector3d acStartTan = new Vector3d(0, 0, 0);
+            Vector3d acEndTan = new Vector3d(0, 0, 0);
+
+            // Create a spline
+            using (Spline acSpline = new Spline(point3DCollection,
+                                            acStartTan,
+                                            acEndTan, 4, 0))
+            {
+
+                // Add the new object to the block table record and the transaction
+                _model.AppendEntity(acSpline);
+                _transaction.AddNewlyCreatedDBObject(acSpline, true);
+            }
         }
     }
 }
