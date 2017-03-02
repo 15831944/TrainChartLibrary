@@ -41,7 +41,6 @@ namespace TrainChartLibrary
             {
                 elementMaker.MakeElement(oper);
             }
-            elementMaker.PrintDict();
         }
     }
 }

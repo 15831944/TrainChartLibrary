@@ -432,30 +432,10 @@ namespace TrainChartLibrary
             _dataBase.Ltscale = scale;
         }
 
-        public void CreateSpline()
-        {
-            // Create a Point3d Collection
-            Point3dCollection acPt3dColl = new Point3dCollection();
-            acPt3dColl.Add(new Point3d(1, 1, 0));
-            acPt3dColl.Add(new Point3d(5, 5, 0));
-            acPt3dColl.Add(new Point3d(10, 0, 0));
-
-            // Set the start and end tangency
-            Vector3d acStartTan = new Vector3d(0.5, 0.5, 0);
-            Vector3d acEndTan = new Vector3d(0.5, 0.5, 0);
-
-            // Create a spline
-            using (Spline acSpline = new Spline(acPt3dColl,
-                                            acStartTan,
-                                            acEndTan, 4, 0))
-            {
-
-                // Add the new object to the block table record and the transaction
-                _model.AppendEntity(acSpline);
-                _transaction.AddNewlyCreatedDBObject(acSpline, true);
-            }
-        }
-
+        /// <summary>
+        /// Создает сплайн по коллекции точек
+        /// </summary>
+        /// <param name="point3DCollection"></param>
         public void MakeSpline(Point3dCollection point3DCollection)
         {
             // Set the start and end tangency
@@ -474,6 +454,10 @@ namespace TrainChartLibrary
             }
         }
 
+        /// <summary>
+        /// Метод для отладки
+        /// </summary>
+        /// <param name="message"></param>
         public void MakeMessage(string message)
         {
             Application.ShowAlertDialog(message);

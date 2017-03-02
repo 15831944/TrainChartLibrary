@@ -15,6 +15,10 @@ namespace TrainChartLibrary
     /// </summary>
     class TrainChartGenerator : IGenerator
     {
+        // Глобальный словарь для хранения точек блоков движения для соединительных линий
+        // Словарь здесь, т.к. для каждой строки суточника создается свой SingleLineCreator
+        public static Dictionary<string, Point3d> LastTrainPointDictionary = new Dictionary<string, Point3d>(); // храним последнюю коорденату блока движения поезда
+
         private readonly ACadWorker _acadWorker; 
         // имя файла с данными для суточника
         private readonly string _fullFileName;
@@ -50,10 +54,7 @@ namespace TrainChartLibrary
                 SingleLineGenerator lineGenerator = new SingleLineGenerator(GetACadWorker(), str, y);
                 lineGenerator.Generate();
                 y -= Constants.HeightOfRow;
-
             }
         }
-
-        
     }
 }
