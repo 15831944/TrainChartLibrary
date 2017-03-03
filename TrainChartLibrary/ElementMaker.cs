@@ -163,7 +163,7 @@ namespace TrainChartLibrary
             _aCadWorker.MakePolyline(beginX, beginY, beginX + duration, beginY + Constants.ElementHeight);
 
             // для соединения
-            MakeMovementLine(trainNumber, beginX, beginY);
+            // MakeMovementLine(trainNumber, beginX, beginY); // не так реализовали соединительные линии
         }
 
         /// <summary>
